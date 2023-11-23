@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 import json
+import datetime
+
 
 class Task:
     def __init__(self, title, description, deadline, priority='Normal', completed=False):
@@ -65,6 +67,16 @@ class ToDoApp(tk.Tk):
         self.complete_button = tk.Button(self.button_frame, text="Toggle Complete", command=self.toggle_complete)
         self.complete_button.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
+    def check_deadlines(self):
+        current_date = datetime.datetime.now()
+        for task in self.todo_list.tasks:
+            if not task.completed:
+                task_deadline = datetime.datetime.strptime(task.deadline, '%Y-%m-%d')
+                if task_deadline < current_date:
+                    messagebox.showwarning("Deadline Passed", f"Task '{task.title}' has passed its deadline!")
+                elif (task_deadline - current_date).days <= 2:  # for example, within 2 days
+                    messagebox.showinfo("Deadline Approaching", f"Task '{task.title}' is approaching its deadline.")
+
     def populate_listbox(self):
         self.listbox.delete(0, tk.END)
         for task in self.todo_list.tasks:
@@ -96,6 +108,12 @@ class ToDoApp(tk.Tk):
         add_button.grid(row=4, column=0, columnspan=2)
 
     def create_task(self, title, description, deadline, priority, window):
+        try:
+            # Validating and converting deadline
+            datetime.datetime.strptime(deadline, '%Y-%m-%d')
+        except ValueError:
+            messagebox.showerror("Error", "Invalid deadline format. Use YYYY-MM-DD.")
+            return
         if title and description and deadline and priority:
             self.todo_list.add_task(Task(title, description, deadline, priority))
             self.populate_listbox()
@@ -125,6 +143,7 @@ class ToDoApp(tk.Tk):
 def main():
     todo_list = ToDoList()
     app = ToDoApp(todo_list)
+    app.after(60000, app.check_deadlines)  # Check deadlines every minute
     app.mainloop()
 
 if __name__ == "__main__":
