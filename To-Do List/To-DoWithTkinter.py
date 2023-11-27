@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import json
 import datetime
+import os
 
 
 class Task:
@@ -18,13 +19,14 @@ class Task:
 class ToDoList:
     def __init__(self):
         self.tasks = []
+        self.file_path = os.path.join(os.path.dirname(__file__), 'tasks.json')
         self.load_tasks()
 
     def add_task(self, task):
         self.tasks.append(task)
 
     def save_tasks(self):
-        with open('tasks.json', 'w') as file:
+         with open(self.file_path, 'w') as file:
             json.dump([task.to_dict() for task in self.tasks], file)
 
     def load_tasks(self):
