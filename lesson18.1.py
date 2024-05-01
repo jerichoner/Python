@@ -1,3 +1,7 @@
+
+#!/usr/bin/env python3
+#/bin/python3 "/home/user/Рабочий стол/Practice/Lect/lesons18.1.py"
+
 import tkinter as tk
 
 def closeWindow():
